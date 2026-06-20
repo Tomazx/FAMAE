@@ -883,76 +883,101 @@
 </footer>
 
 <script>
-  // ── AUDIO TÁCTICO (basado en archivos — poné tus .mp3/.wav/.ogg en sounds/) ──
-  // Creá una carpeta "sounds" al lado de este HTML y guardá ahí tus archivos
-  // con estos nombres exactos (o cambiá las rutas de abajo si preferís otros nombres):
+  // ════════════════════════════════════════════════════════
+  //  CONFIGURACIÓN DE AUDIO — editá solo esta sección
+  // ════════════════════════════════════════════════════════
+
+  const MUSIC_FILE = 'Sounds/ambient.mp3'; // música ambiental en loop — mp3/ogg/wav
+  const MUSIC_VOLUME = 0.18;               // qué tan fuerte suena la música (0.0–1.0)
+                                           // mantenelo bajo (0.1–0.25) para que no tape los sfx
+
   const SFX_FILES = {
-    hover:    'sounds/hover.mp3',    // tick al pasar el mouse: nav, cards, botones
-    click:    'sounds/click.mp3',    // click en los links del nav (Info/Reglamento/etc)
-    confirm:  'sounds/confirm.wav',  // click en Discord / CTA / redes sociales
-    ping:     'sounds/ping.wav',     // al aparecer cada sección haciendo scroll
-    glitch:   'sounds/glitch.mp3',   // estática sincronizada con el glitch del título (cada 8s)
-    poweron:  'sounds/poweron.wav',  // al activar el audio con el botón
-    poweroff: 'sounds/poweroff.wav'  // al desactivar el audio con el botón
+    hover:    'Sounds/hover.mp3',    // pasar el mouse por nav, cards, botones
+    click:    'Sounds/click.mp3',    // click en links del nav
+    confirm:  'Sounds/confirm.flac', // click en Discord / CTA / redes
+    ping:     'Sounds/ping.wav',     // al aparecer cada sección en el scroll
+    glitch:   'Sounds/glitch.mp3',   // cada 8s sincronizado con el glitch del título
+    poweron:  'Sounds/poweron.wav',  // al activar el audio
+    poweroff: 'Sounds/poweroff.wav'  // al desactivar el audio
   };
 
+  const SFX_VOLUME = 0.8; // volumen general de los efectos (0.0–1.0)
+
+  // ════════════════════════════════════════════════════════
+
   let soundOn = false;
-  const masterVolume = 0.8; // 0.0 a 1.0 — volumen general de todos los sonidos
   const sfxCache = {};
 
-  function loadSFX() {
-    Object.entries(SFX_FILES).forEach(([key, path]) => {
-      const audio = new Audio(path);
-      audio.preload = 'auto';
-      sfxCache[key] = audio;
-    });
-  }
-  loadSFX();
+  // precarga de efectos
+  Object.entries(SFX_FILES).forEach(([key, path]) => {
+    const a = new Audio(path);
+    a.preload = 'auto';
+    sfxCache[key] = a;
+  });
 
-  // vol: multiplicador 0.0–1.0 sobre el masterVolume, para variar intensidad por elemento
+  // música ambiental — se crea una sola vez y hace loop
+  const musicTrack = new Audio(MUSIC_FILE);
+  musicTrack.loop    = true;
+  musicTrack.volume  = MUSIC_VOLUME;
+  musicTrack.preload = 'auto';
+
   function playSFX(key, vol = 1) {
     if (!soundOn && key !== 'poweron' && key !== 'poweroff') return;
     const base = sfxCache[key];
     if (!base) return;
-    const node = base.cloneNode(true); // clonado para permitir sonidos superpuestos (ej. hover rápido)
-    node.volume = Math.min(1, Math.max(0, vol * masterVolume));
-    node.play().catch(() => {
-      // si el archivo no existe todavía o el navegador bloqueó el autoplay, se ignora en silencio
-    });
+    const node = base.cloneNode(true);
+    node.volume = Math.min(1, Math.max(0, vol * SFX_VOLUME));
+    node.play().catch(() => {});
   }
 
   // ── TOGGLE DE SONIDO ──
-  const soundBtn = document.getElementById('sound-toggle');
+  const soundBtn  = document.getElementById('sound-toggle');
   const wavesPath = document.getElementById('sound-waves');
-  const xLine1 = document.getElementById('sound-x1');
-  const xLine2 = document.getElementById('sound-x2');
+  const xLine1    = document.getElementById('sound-x1');
+  const xLine2    = document.getElementById('sound-x2');
   const soundLabel = document.getElementById('sound-label');
 
   soundBtn.addEventListener('click', () => {
     soundOn = !soundOn;
     soundBtn.classList.toggle('active', soundOn);
-    wavesPath.style.display = soundOn ? '' : 'none';
-    xLine1.style.display = soundOn ? 'none' : '';
-    xLine2.style.display = soundOn ? 'none' : '';
-    soundLabel.textContent = soundOn ? 'AUDIO ACTIVO' : 'ACTIVAR AUDIO';
-    playSFX(soundOn ? 'poweron' : 'poweroff');
+    wavesPath.style.display  = soundOn ? '' : 'none';
+    xLine1.style.display     = soundOn ? 'none' : '';
+    xLine2.style.display     = soundOn ? 'none' : '';
+    soundLabel.textContent   = soundOn ? 'AUDIO ACTIVO' : 'ACTIVAR AUDIO';
+
+    if (soundOn) {
+      playSFX('poweron');
+      musicTrack.play().catch(() => {});  // arranca la música
+    } else {
+      playSFX('poweroff');
+      // fade out de la música en 1.5 segundos en vez de cortar seco
+      const fadeOut = setInterval(() => {
+        if (musicTrack.volume > 0.015) {
+          musicTrack.volume = Math.max(0, musicTrack.volume - 0.015);
+        } else {
+          musicTrack.pause();
+          musicTrack.currentTime = 0;
+          musicTrack.volume = MUSIC_VOLUME; // restaura para el próximo play
+          clearInterval(fadeOut);
+        }
+      }, 30);
+    }
   });
 
-  // ── HOVER / CLICK TÁCTICOS ──
+  // ── HOOKS DE INTERACCIÓN ──
   document.querySelectorAll('.nav-links a').forEach(el => {
     el.addEventListener('mouseenter', () => playSFX('hover', 0.8));
-    el.addEventListener('click', () => playSFX('click'));
+    el.addEventListener('click',      () => playSFX('click'));
   });
 
-  // mouseenter no dispara en touch — se agrega click como respaldo para mobile
   document.querySelectorAll('.card, .member, .stat').forEach(el => {
     el.addEventListener('mouseenter', () => playSFX('hover', 0.55));
-    el.addEventListener('click', () => playSFX('hover', 0.55));
+    el.addEventListener('click',      () => playSFX('hover', 0.55));
   });
 
   document.querySelectorAll('.hero-cta, .discord-cta, .social-link').forEach(el => {
     el.addEventListener('mouseenter', () => playSFX('hover', 0.8));
-    el.addEventListener('click', () => playSFX('confirm'));
+    el.addEventListener('click',      () => playSFX('confirm'));
   });
 
   // ── PARTICLES ──
@@ -1025,4 +1050,3 @@
 </script>
 </body>
 </html>
-
