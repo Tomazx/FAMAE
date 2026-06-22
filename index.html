@@ -258,6 +258,7 @@
   @media (max-width: 600px) {
     .sound-toggle { bottom: 16px; right: 16px; padding: 10px 14px; font-size: 0.62rem; }
   }
+
   /* ── VENTANA HUD FLOTANTE ── */
   .hud-window {
     position: fixed;
@@ -641,31 +642,6 @@
     .intel-panel--wide { grid-column: 1; }
     .intel-stats-row { grid-template-columns: repeat(2,1fr); }
   }
-  section {
-    position: relative;
-    z-index: 1;
-    padding: 100px 48px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .section-label {
-    font-family: var(--mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.4em;
-    color: var(--red-glow);
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-
-  .section-title {
-    font-family: var(--display);
-    font-size: clamp(1.8rem, 4vw, 3rem);
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 48px;
-  }
-  /* ── SECTIONS ── */
   section {
     position: relative;
     z-index: 1;
@@ -1284,6 +1260,203 @@
   </div>
 </section>
 
+<!-- INTEL PANEL -->
+<section id="intel">
+  <div class="reveal" data-sound="ping">
+    <div class="section-label">// 002.5 — estado operacional</div>
+    <h2 class="section-title">Panel de Inteligencia</h2>
+  </div>
+
+  <!-- Stats superiores -->
+  <div class="intel-panel intel-panel--wide reveal">
+    <div class="intel-panel__scan"></div>
+    <div class="intel-stats-row">
+      <div>
+        <div class="intel-bigstat__val" id="stat-ops">47</div>
+        <div class="intel-bigstat__label">Operaciones<br>Exitosas</div>
+      </div>
+      <div>
+        <div class="intel-bigstat__val" id="stat-members" style="color:#4ade80">—</div>
+        <div class="intel-bigstat__label">Miembros<br>Activos</div>
+      </div>
+      <div>
+        <div class="intel-bigstat__val" id="stat-online" style="font-size:2.2rem">—</div>
+        <div class="intel-bigstat__label">En Línea<br>Ahora</div>
+      </div>
+      <div>
+        <div class="intel-bigstat__val" style="color:#fbbf24">94%</div>
+        <div class="intel-bigstat__label">Tasa de<br>Éxito</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="intel-grid">
+
+    <!-- Nivel de tensión -->
+    <div class="intel-panel reveal">
+      <div class="intel-panel__scan"></div>
+      <div class="intel-panel__header">
+        <span>// Tensión Mundial</span>
+        <div class="intel-panel__dots">
+          <div class="intel-panel__dot"></div>
+          <div class="intel-panel__dot"></div>
+          <div class="intel-panel__dot"></div>
+        </div>
+      </div>
+      <div class="intel-panel__body">
+        <div class="tension-bar-label">
+          <span>NIVEL DE TENSIÓN GLOBAL</span>
+          <span id="tension-val" style="color:var(--red-glow)">62%</span>
+        </div>
+        <div class="tension-bar">
+          <div class="tension-bar__fill tension-bar__fill--high" id="tension-fill" style="width:0%"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-family:var(--mono); font-size:0.5rem; color:rgba(192,57,43,0.3); margin-top:4px;">
+          <span>ESTABLE</span><span>ELEVADO</span><span>CRÍTICO</span>
+        </div>
+        <div class="intel-row" style="margin-top:10px;">
+          <span>Estado teatro BRM5</span>
+          <span class="intel-row__val intel-row__val--yellow">ELEVADO</span>
+        </div>
+        <div class="intel-row">
+          <span>Facciones enemigas activas</span>
+          <span class="intel-row__val intel-row__val--red">4</span>
+        </div>
+        <div class="intel-row">
+          <span>Zonas en conflicto</span>
+          <span class="intel-row__val">7 / 12</span>
+        </div>
+        <div class="intel-row">
+          <span>Alerta FAMAE</span>
+          <span class="intel-row__val intel-row__val--yellow">▲ BRAVO</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Última operación -->
+    <div class="intel-panel reveal">
+      <div class="intel-panel__scan"></div>
+      <div class="intel-panel__header">
+        <span>// Última Operación</span>
+        <div class="intel-panel__dots">
+          <div class="intel-panel__dot"></div>
+          <div class="intel-panel__dot"></div>
+          <div class="intel-panel__dot"></div>
+        </div>
+      </div>
+      <div class="intel-panel__body">
+        <div class="intel-row">
+          <span>Designación</span>
+          <span class="intel-row__val intel-row__val--red">OP. DESIERTO ROJO</span>
+        </div>
+        <div class="intel-row">
+          <span>Tipo</span>
+          <span class="intel-row__val">Escolta / Convoy</span>
+        </div>
+        <div class="intel-row">
+          <span>Teatro</span>
+          <span class="intel-row__val">Sahel Norte — BRM5</span>
+        </div>
+        <div class="intel-row">
+          <span>Efectivos desplegados</span>
+          <span class="intel-row__val">8 operativos</span>
+        </div>
+        <div class="intel-row">
+          <span>Bajas FAMAE</span>
+          <span class="intel-row__val intel-row__val--green">0</span>
+        </div>
+        <div class="intel-row">
+          <span>Resultado</span>
+          <span class="intel-row__val intel-row__val--green">✓ EXITOSA</span>
+        </div>
+        <div class="intel-row">
+          <span>Estado</span>
+          <span class="intel-row__val" style="color:var(--muted)">ARCHIVADA</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SYS STATUS -->
+    <div class="intel-panel reveal">
+      <div class="intel-panel__scan"></div>
+      <div class="intel-panel__header">
+        <span>// SYS Status</span>
+        <div class="intel-panel__dots">
+          <div class="intel-panel__dot"></div>
+          <div class="intel-panel__dot"></div>
+          <div class="intel-panel__dot"></div>
+        </div>
+      </div>
+      <div class="intel-panel__body">
+        <div class="intel-row">
+          <span>Sistema</span>
+          <span class="intel-row__val intel-row__val--green">ONLINE</span>
+        </div>
+        <div class="intel-row">
+          <span>Cifrado</span>
+          <span class="intel-row__val intel-row__val--green">AES-256</span>
+        </div>
+        <div class="intel-row">
+          <span>Servidor</span>
+          <span class="intel-row__val">GitHub Pages</span>
+        </div>
+        <div class="intel-row">
+          <span>Coordenadas</span>
+          <span class="intel-row__val">27.3°S 70.1°W</span>
+        </div>
+        <div class="intel-row">
+          <span>Uptime sesión</span>
+          <span class="intel-row__val" id="intel-uptime">00:00:00</span>
+        </div>
+        <div class="intel-row">
+          <span>Hora local</span>
+          <span class="intel-row__val" id="intel-clock">00:00:00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Operador del mes -->
+    <div class="intel-panel reveal">
+      <div class="intel-panel__scan"></div>
+      <div class="intel-panel__header">
+        <span>// Operador del Mes</span>
+        <div class="intel-panel__dots">
+          <div class="intel-panel__dot"></div>
+          <div class="intel-panel__dot"></div>
+          <div class="intel-panel__dot"></div>
+        </div>
+      </div>
+      <div class="intel-panel__body">
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid rgba(192,57,43,0.1);">
+          <div style="width:44px; height:44px; border:1px solid rgba(192,57,43,0.4); display:flex; align-items:center; justify-content:center; font-family:var(--display); font-size:1.2rem; font-weight:700; color:var(--red-glow); flex-shrink:0;">T</div>
+          <div>
+            <div style="font-family:var(--mono); font-size:0.75rem; color:var(--text); letter-spacing:0.1em;">TWIN</div>
+            <div style="font-family:var(--mono); font-size:0.58rem; color:var(--red-glow); letter-spacing:0.15em;">★ COMANDANTE</div>
+          </div>
+        </div>
+        <div class="intel-row">
+          <span>Operaciones lideradas</span>
+          <span class="intel-row__val intel-row__val--red">12</span>
+        </div>
+        <div class="intel-row">
+          <span>Tasa de éxito</span>
+          <span class="intel-row__val intel-row__val--green">100%</span>
+        </div>
+        <div class="intel-row">
+          <span>Bajas causadas</span>
+          <span class="intel-row__val">34</span>
+        </div>
+        <div class="intel-row">
+          <span>Distinción</span>
+          <span class="intel-row__val intel-row__val--yellow">★ ÉLITE</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
 <!-- WIKI -->
 <section id="wiki">
   <div class="reveal" data-sound="ping">
@@ -1330,6 +1503,7 @@
 <div class="hud-window">
   <div class="hud-window__titlebar">
     <span class="hud-window__title">// SYS STATUS</span>
+    <button class="hud-window__close" id="hud-close">[X]</button>
     <div class="hud-window__dots">
       <div class="hud-window__dot"></div>
       <div class="hud-window__dot"></div>
@@ -1609,6 +1783,13 @@
       if (e.isIntersecting) {
         e.target.classList.add('visible');
         if (e.target.dataset.sound === 'ping') playSFX('ping');
+        // animar barra de tensión cuando entra en vista
+        if (e.target.closest('#intel')) {
+          setTimeout(() => {
+            const fill = document.getElementById('tension-fill');
+            if (fill && fill.style.width === '0%') fill.style.width = '62%';
+          }, 400);
+        }
         observer.unobserve(e.target);
       }
     });
@@ -1617,9 +1798,61 @@
 
   // ── BOOT SCREEN ──
   (function() {
-    const screen = document.getElementById('boot-screen');
+    const screen    = document.getElementById('boot-screen');
     const container = document.getElementById('boot-lines');
 
+    // ─ Audio sintetizado para el tecleo (no necesita archivos externos) ─
+    let bootCtx = null;
+    let audioUnlocked = false;
+
+    function unlockBootAudio() {
+      if (audioUnlocked) return;
+      try {
+        bootCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (bootCtx.state === 'suspended') bootCtx.resume();
+        audioUnlocked = true;
+      } catch(e) {}
+    }
+
+    // click mecánico de tecla — ruido blanco cortísimo con highpass
+    function keyClick(vol = 0.35) {
+      if (!bootCtx) return;
+      try {
+        const t   = bootCtx.currentTime;
+        const buf = bootCtx.createBuffer(1, bootCtx.sampleRate * 0.03, bootCtx.sampleRate);
+        const d   = buf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+        const src = bootCtx.createBufferSource();
+        src.buffer = buf;
+        const hp  = bootCtx.createBiquadFilter();
+        hp.type = 'highpass'; hp.frequency.value = 4000;
+        const g   = bootCtx.createGain();
+        g.gain.setValueAtTime(vol, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.025);
+        src.connect(hp).connect(g).connect(bootCtx.destination);
+        src.start(t); src.stop(t + 0.03);
+      } catch(e) {}
+    }
+
+    // beep de error/corrupción — tono bajo que cae
+    function corruptBeep() {
+      if (!bootCtx) return;
+      try {
+        const t   = bootCtx.currentTime;
+        const osc = bootCtx.createOscillator();
+        const g   = bootCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(280, t);
+        osc.frequency.exponentialRampToValueAtTime(80, t + 0.25);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(0.3, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+        osc.connect(g).connect(bootCtx.destination);
+        osc.start(t); osc.stop(t + 0.3);
+      } catch(e) {}
+    }
+
+    // ─ Líneas del boot ─
     const lines = [
       { text: 'FAMAE TACTICAL OS v2.4.1 — BIOS POST OK',           tag: null,  delay: 0   },
       { text: 'CPU: FAMAE-X4 @ 3.8GHz ... [4 cores detected]',     tag: null,  delay: 180 },
@@ -1644,52 +1877,84 @@
 
     let timers = [];
 
+    // Tipea letra por letra con sonido en cada carácter
+    function typeLine(div, text, tag, onDone) {
+      let i = 0;
+      const chars = text.split('');
+      // velocidad variable — más rápido en texto largo
+      const speed = text.length > 30 ? 18 : 28;
+
+      function next() {
+        if (i >= chars.length) {
+          // al terminar, agrega el tag si corresponde
+          if (tag) {
+            const span = document.createElement('span');
+            span.className = 'boot-tag';
+            span.textContent = '[ ' + tag + ' ]';
+            div.appendChild(span);
+            keyClick(0.5); // click más fuerte al confirmar
+          }
+          if (onDone) onDone();
+          return;
+        }
+        div.textContent += chars[i];
+        // sonido cada 1-3 chars para no saturar
+        if (i % 2 === 0) keyClick(0.25 + Math.random() * 0.15);
+        i++;
+        setTimeout(next, speed + Math.random() * 12);
+      }
+      next();
+    }
+
     function spawnLine(data) {
       const div = document.createElement('div');
       div.className = 'boot-line' + (data.tag === 'OK' ? ' ok' : data.tag === 'FAIL' ? ' fail' : '');
-      if (data.tag) {
-        div.innerHTML = data.text + '<span class="boot-tag">[ ' + data.tag + ' ]</span>';
-      } else {
-        div.textContent = data.text;
-      }
       container.appendChild(div);
-      requestAnimationFrame(() => div.classList.add('show'));
+      requestAnimationFrame(() => {
+        div.classList.add('show');
+        if (data.text) typeLine(div, data.text, data.tag, null);
+      });
     }
 
-    // Muestra las líneas una a una
+    // Desbloquear audio al primer movimiento/click — la pantalla cubre todo
+    document.addEventListener('mousemove', unlockBootAudio, { once: true });
+    document.addEventListener('keydown',   unlockBootAudio, { once: true });
+    document.addEventListener('touchstart',unlockBootAudio, { once: true, passive: true });
+    // intento inmediato (funciona en algunos navegadores sin interacción)
+    setTimeout(unlockBootAudio, 100);
+
     lines.forEach(line => {
       timers.push(setTimeout(() => spawnLine(line), line.delay));
     });
 
-    // Añade cursor parpadeando al final
+    // cursor parpadeando
     timers.push(setTimeout(() => {
       const cur = document.createElement('div');
       cur.className = 'boot-line show';
-      cur.innerHTML = '_ <span class="boot-cursor"></span>';
+      cur.innerHTML = '<span class="boot-cursor"></span>';
       container.appendChild(cur);
     }, 2450));
 
-    // Fase de corrupción — texto se vuelve rojo y glitchea
+    // corrupción
     timers.push(setTimeout(() => {
+      corruptBeep();
       screen.classList.add('corrupting');
-      // Hace glitch a líneas random
-      const all = container.querySelectorAll('.boot-line');
-      all.forEach(el => {
+      container.querySelectorAll('.boot-line').forEach(el => {
         if (Math.random() > 0.4) el.classList.add('boot-glitch');
       });
     }, 3000));
 
-    // Corrupción de caracteres random
     timers.push(setTimeout(() => {
       const chars = '█▓▒░╔╗╚╝║═╠╣╦╩╬▄▀■□▪▫';
       const all = container.querySelectorAll('.boot-line');
       let itr = 0;
       const corrupt = setInterval(() => {
         if (itr > 18) { clearInterval(corrupt); return; }
+        // beep rápido de estática durante la corrupción
+        if (itr % 4 === 0) keyClick(0.4);
         all.forEach(el => {
           if (Math.random() > 0.6) {
-            const orig = el.textContent;
-            const arr  = orig.split('');
+            const arr = el.textContent.split('');
             for (let i = 0; i < 4; i++) {
               const pos = Math.floor(Math.random() * arr.length);
               arr[pos] = chars[Math.floor(Math.random() * chars.length)];
@@ -1701,19 +1966,24 @@
       }, 60);
     }, 3200));
 
-    // Flash final y desaparece
     timers.push(setTimeout(() => {
       screen.style.transition = 'opacity 0.35s ease';
       screen.style.opacity = '0';
-      setTimeout(() => screen.classList.add('hidden'), 370);
+      setTimeout(() => {
+        screen.classList.add('hidden');
+        if (bootCtx) bootCtx.close();
+      }, 370);
     }, 3900));
 
-    // Click para saltear
     screen.addEventListener('click', () => {
+      unlockBootAudio();
       timers.forEach(clearTimeout);
       screen.style.transition = 'opacity 0.2s';
       screen.style.opacity = '0';
-      setTimeout(() => screen.classList.add('hidden'), 220);
+      setTimeout(() => {
+        screen.classList.add('hidden');
+        if (bootCtx) bootCtx.close();
+      }, 220);
     });
   })();
 
@@ -1723,14 +1993,20 @@
   function updateClock() {
     const now = new Date();
     const hh = pad(now.getHours()), mm = pad(now.getMinutes()), ss = pad(now.getSeconds());
-    const clock = document.getElementById('hud-clock');
-    if (clock) clock.textContent = `${hh}:${mm}:${ss}`;
+    const timeStr = `${hh}:${mm}:${ss}`;
+    ['hud-clock','intel-clock'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = timeStr;
+    });
     const elapsed = Math.floor((Date.now() - startTime) / 1000);
     const uh = pad(Math.floor(elapsed / 3600));
     const um = pad(Math.floor((elapsed % 3600) / 60));
     const us = pad(elapsed % 60);
-    const uptime = document.getElementById('hud-uptime');
-    if (uptime) uptime.textContent = `${uh}:${um}:${us}`;
+    const uptimeStr = `${uh}:${um}:${us}`;
+    ['hud-uptime','intel-uptime'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = uptimeStr;
+    });
   }
   setInterval(updateClock, 1000);
   updateClock();
@@ -1742,12 +2018,60 @@
       const data = await res.json();
       const total  = data.approximate_member_count;
       const online = data.approximate_presence_count;
-      if (total)  document.getElementById('dc-total').textContent  = total.toLocaleString();
-      if (online) document.getElementById('dc-online').textContent = online.toLocaleString();
+      if (total) {
+        document.getElementById('dc-total').textContent = total.toLocaleString();
+        const sm = document.getElementById('stat-members');
+        if (sm) sm.textContent = total.toLocaleString();
+      }
+      if (online) {
+        document.getElementById('dc-online').textContent = online.toLocaleString();
+        const so = document.getElementById('stat-online');
+        if (so) so.textContent = online.toLocaleString();
+      }
     } catch (e) { /* sin conexión, queda en — */ }
   }
   fetchDiscordStats();
   setInterval(fetchDiscordStats, 60000);
+
+  // ── HUD WINDOW DRAGGABLE ──
+  (function() {
+    const win = document.querySelector('.hud-window');
+    if (!win) return;
+    let dragging = false, ox = 0, oy = 0;
+    win.addEventListener('mousedown', e => {
+      dragging = true;
+      ox = e.clientX - win.getBoundingClientRect().left;
+      oy = e.clientY - win.getBoundingClientRect().top;
+      win.style.transition = 'none';
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const x = Math.max(0, Math.min(window.innerWidth  - win.offsetWidth,  e.clientX - ox));
+      const y = Math.max(0, Math.min(window.innerHeight - win.offsetHeight, e.clientY - oy));
+      win.style.left   = x + 'px';
+      win.style.top    = y + 'px';
+      win.style.bottom = 'auto';
+    });
+    document.addEventListener('mouseup', () => { dragging = false; });
+    // touch support
+    win.addEventListener('touchstart', e => {
+      const t = e.touches[0];
+      dragging = true;
+      ox = t.clientX - win.getBoundingClientRect().left;
+      oy = t.clientY - win.getBoundingClientRect().top;
+    }, { passive: true });
+    document.addEventListener('touchmove', e => {
+      if (!dragging) return;
+      const t = e.touches[0];
+      const x = Math.max(0, Math.min(window.innerWidth  - win.offsetWidth,  t.clientX - ox));
+      const y = Math.max(0, Math.min(window.innerHeight - win.offsetHeight, t.clientY - oy));
+      win.style.left   = x + 'px';
+      win.style.top    = y + 'px';
+      win.style.bottom = 'auto';
+    }, { passive: true });
+    document.addEventListener('touchend', () => { dragging = false; });
+  })();
 
   // ── HUD DATA STREAMS ──
   const streamData = [
@@ -1774,6 +2098,19 @@
     playSFX('glitch');
     setInterval(() => playSFX('glitch'), 8000);
   }, GLITCH_FIRST);
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ const hudWindow=document.querySelector(".hud-window");
+ const hudClose=document.getElementById("hud-close");
+ if(hudWindow && hudClose){
+   hudClose.addEventListener("click",()=>{
+      hudWindow.style.display="none";
+   });
+ }
+});
 </script>
 
 </body>
