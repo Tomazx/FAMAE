@@ -32,6 +32,84 @@
     min-height: 100vh;
   }
 
+  /* ── HUD OVERLAYS ── */
+  .hud-scanline {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px, transparent 3px,
+      rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px
+    );
+  }
+  .hud-noise {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    opacity: 0.018;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    animation: noiseShift 0.4s steps(1) infinite;
+  }
+  @keyframes noiseShift {
+    0%   { background-position: 0 0; }
+    25%  { background-position: -50px 30px; }
+    50%  { background-position: 20px -40px; }
+    75%  { background-position: -30px -20px; }
+    100% { background-position: 10px 50px; }
+  }
+  .hud-vignette {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: radial-gradient(ellipse at center,
+      transparent 55%,
+      rgba(0,0,0,0.55) 100%
+    );
+  }
+  /* esquinas tácticas */
+  .hud-corner {
+    position: fixed; z-index: 2; pointer-events: none;
+    width: 36px; height: 36px;
+    animation: cornerPulse 4s ease-in-out infinite;
+  }
+  .hud-corner--tl { top: 12px; left: 12px;
+    border-top: 1px solid rgba(192,57,43,0.6);
+    border-left: 1px solid rgba(192,57,43,0.6); }
+  .hud-corner--tr { top: 12px; right: 12px;
+    border-top: 1px solid rgba(192,57,43,0.6);
+    border-right: 1px solid rgba(192,57,43,0.6); }
+  .hud-corner--bl { bottom: 12px; left: 12px;
+    border-bottom: 1px solid rgba(192,57,43,0.6);
+    border-left: 1px solid rgba(192,57,43,0.6); }
+  .hud-corner--br { bottom: 12px; right: 12px;
+    border-bottom: 1px solid rgba(192,57,43,0.6);
+    border-right: 1px solid rgba(192,57,43,0.6); }
+  @keyframes cornerPulse {
+    0%,100% { opacity: 0.5; }
+    50%      { opacity: 1; }
+  }
+  /* streams de datos laterales */
+  .hud-stream {
+    position: fixed; top: 0; bottom: 0; z-index: 1;
+    pointer-events: none; overflow: hidden;
+    width: 18px;
+    display: flex; flex-direction: column;
+    gap: 0;
+  }
+  .hud-stream--left  { left: 4px; }
+  .hud-stream--right { right: 4px; }
+  .hud-stream__text {
+    font-family: var(--mono);
+    font-size: 7px;
+    color: rgba(192,57,43,0.25);
+    line-height: 1.6;
+    writing-mode: vertical-rl;
+    white-space: nowrap;
+    animation: streamScroll 18s linear infinite;
+    letter-spacing: 1px;
+  }
+  .hud-stream--right .hud-stream__text { animation-duration: 24s; }
+  @keyframes streamScroll {
+    from { transform: translateY(-50%); }
+    to   { transform: translateY(0%); }
+  }
+
   /* ── CANVAS PARTICLES ── */
   #canvas {
     position: fixed;
@@ -123,7 +201,45 @@
     .sound-toggle { bottom: 16px; right: 16px; padding: 10px 14px; font-size: 0.62rem; }
   }
 
-  /* ── HERO ── */
+  /* ── DISCORD COUNTER ── */
+  .discord-counter {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .discord-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 24px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    min-width: 110px;
+  }
+  .discord-stat__value {
+    font-family: var(--mono);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--red-glow);
+    line-height: 1;
+  }
+  .discord-stat__label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .discord-stat__dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    margin-bottom: 2px;
+  }
+  .discord-stat__dot--green { background: #3ba55d; box-shadow: 0 0 6px #3ba55d; }
+  .discord-stat__dot--gray  { background: #888; }
   .hero {
     position: relative;
     z-index: 1;
@@ -608,6 +724,21 @@
 </head>
 <body>
 
+<!-- HUD OVERLAYS -->
+<div class="hud-scanline"></div>
+<div class="hud-noise"></div>
+<div class="hud-vignette"></div>
+<div class="hud-corner hud-corner--tl"></div>
+<div class="hud-corner hud-corner--tr"></div>
+<div class="hud-corner hud-corner--bl"></div>
+<div class="hud-corner hud-corner--br"></div>
+<div class="hud-stream hud-stream--left">
+  <div class="hud-stream__text" id="stream-left"></div>
+</div>
+<div class="hud-stream hud-stream--right">
+  <div class="hud-stream__text" id="stream-right"></div>
+</div>
+
 <canvas id="canvas"></canvas>
 
 <!-- NAV -->
@@ -637,7 +768,19 @@
   <h1 class="hero-title">FAMAE</h1>
   <div class="hero-divider"></div>
   <p class="hero-sub">SIN HONOR, NO HAY CONTRATO</p>
-  <div style="display:flex; gap:16px; margin-top:32px; flex-wrap:wrap; justify-content:center;">
+  <div class="discord-counter">
+    <div class="discord-stat">
+      <div class="discord-stat__dot discord-stat__dot--gray"></div>
+      <div class="discord-stat__value" id="dc-total">—</div>
+      <div class="discord-stat__label">Miembros</div>
+    </div>
+    <div class="discord-stat">
+      <div class="discord-stat__dot discord-stat__dot--green"></div>
+      <div class="discord-stat__value" id="dc-online">—</div>
+      <div class="discord-stat__label">En línea</div>
+    </div>
+  </div>
+  <div style="display:flex; gap:16px; margin-top:0px; flex-wrap:wrap; justify-content:center;">
     <a href="https://discord.gg/UkWFk54NVW" target="_blank" class="discord-cta">
       <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.245.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.076.076 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
       Unirse al Discord
@@ -895,8 +1038,8 @@
     hover:    'Sounds/hover.mp3',    // pasar el mouse por nav, cards, botones
     click:    'Sounds/click.mp3',    // click en links del nav
     confirm:  'Sounds/confirm.flac', // click en Discord / CTA / redes
-    ping:     'Sounds/ping.mp3',     // al aparecer cada sección en el scroll
-    glitch:   'Sounds/glitch.wav',   // cada 8s sincronizado con el glitch del título
+    ping:     'Sounds/ping.wav',     // al aparecer cada sección en el scroll
+    glitch:   'Sounds/glitch.mp3',   // cada 8s sincronizado con el glitch del título
     poweron:  'Sounds/poweron.wav',  // al activar el audio
     poweroff: 'Sounds/poweroff.wav'  // al desactivar el audio
   };
@@ -983,7 +1126,8 @@
   // ── PARTICLES ──
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
-  let W, H, particles = [];
+  let W, H;
+  let dust = [], streaks = [], flares = [];
 
   function resize() {
     W = canvas.width = window.innerWidth;
@@ -992,25 +1136,25 @@
   resize();
   window.addEventListener('resize', resize);
 
-  class Particle {
-    constructor() { this.reset(true); }
+  // CAPA 1 — polvo flotante (partículas clásicas, más densas)
+  class Dust {
+    constructor(init) { this.reset(init); }
     reset(init) {
-      this.x = Math.random() * W;
-      this.y = init ? Math.random() * H : H + 10;
-      this.size = Math.random() * 1.5 + 0.3;
-      this.speedY = -(Math.random() * 0.4 + 0.1);
-      this.speedX = (Math.random() - 0.5) * 0.15;
-      this.alpha = Math.random() * 0.6 + 0.1;
+      this.x     = Math.random() * W;
+      this.y     = init ? Math.random() * H : H + 5;
+      this.size  = Math.random() * 1.8 + 0.2;
+      this.vy    = -(Math.random() * 0.35 + 0.08);
+      this.vx    = (Math.random() - 0.5) * 0.18;
+      this.alpha = Math.random() * 0.55 + 0.08;
       this.pulse = Math.random() * Math.PI * 2;
     }
     update() {
-      this.x += this.speedX;
-      this.y += this.speedY;
-      this.pulse += 0.02;
-      if (this.y < -10) this.reset(false);
+      this.x += this.vx; this.y += this.vy;
+      this.pulse += 0.018;
+      if (this.y < -5) this.reset(false);
     }
     draw() {
-      const a = this.alpha * (0.7 + 0.3 * Math.sin(this.pulse));
+      const a = this.alpha * (0.65 + 0.35 * Math.sin(this.pulse));
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(192,57,43,${a})`;
@@ -1018,11 +1162,84 @@
     }
   }
 
-  for (let i = 0; i < 120; i++) particles.push(new Particle());
+  // CAPA 2 — líneas de datos que caen (tipo HUD táctico)
+  class Streak {
+    constructor(init) { this.reset(init); }
+    reset(init) {
+      this.x      = Math.random() * W;
+      this.y      = init ? Math.random() * H : -60;
+      this.len    = Math.random() * 55 + 18;
+      this.speed  = Math.random() * 1.2 + 0.4;
+      this.alpha  = Math.random() * 0.18 + 0.04;
+      this.width  = Math.random() < 0.15 ? 1.5 : 0.7; // alguna más gruesa
+    }
+    update() {
+      this.y += this.speed;
+      if (this.y - this.len > H) this.reset(false);
+    }
+    draw() {
+      const grad = ctx.createLinearGradient(this.x, this.y - this.len, this.x, this.y);
+      grad.addColorStop(0, `rgba(192,57,43,0)`);
+      grad.addColorStop(1, `rgba(192,57,43,${this.alpha})`);
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y - this.len);
+      ctx.lineTo(this.x, this.y);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = this.width;
+      ctx.stroke();
+    }
+  }
+
+  // CAPA 3 — destellos de radar (cruces que parpadean y desaparecen)
+  class Flare {
+    constructor() { this.spawn(); }
+    spawn() {
+      this.x      = Math.random() * W;
+      this.y      = Math.random() * H;
+      this.life   = 0;
+      this.maxLife = Math.random() * 90 + 40;
+      this.size   = Math.random() * 3 + 1.5;
+      this.delay  = Math.random() * 300; // frames antes de aparecer el próximo
+    }
+    update() {
+      if (this.delay > 0) { this.delay--; return; }
+      this.life++;
+      if (this.life > this.maxLife) this.spawn();
+    }
+    draw() {
+      if (this.delay > 0) return;
+      const t = this.life / this.maxLife;
+      const a = t < 0.3
+        ? t / 0.3                  // fade in
+        : t > 0.7
+          ? (1 - t) / 0.3          // fade out
+          : 1;                     // pleno
+      const s = this.size * (0.8 + 0.2 * Math.sin(this.life * 0.25));
+      ctx.strokeStyle = `rgba(192,57,43,${a * 0.6})`;
+      ctx.lineWidth = 0.8;
+      // cruz
+      ctx.beginPath();
+      ctx.moveTo(this.x - s, this.y); ctx.lineTo(this.x + s, this.y);
+      ctx.moveTo(this.x, this.y - s); ctx.lineTo(this.x, this.y + s);
+      ctx.stroke();
+      // punto central
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, 0.8, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(192,57,43,${a * 0.9})`;
+      ctx.fill();
+    }
+  }
+
+  // inicializar las 3 capas
+  for (let i = 0; i < 160; i++) dust.push(new Dust(true));
+  for (let i = 0; i < 35;  i++) streaks.push(new Streak(true));
+  for (let i = 0; i < 18;  i++) flares.push(new Flare());
 
   function loop() {
     ctx.clearRect(0, 0, W, H);
-    particles.forEach(p => { p.update(); p.draw(); });
+    streaks.forEach(s => { s.update(); s.draw(); });
+    dust.forEach(d    => { d.update(); d.draw(); });
+    flares.forEach(f  => { f.update(); f.draw(); });
     requestAnimationFrame(loop);
   }
   loop();
@@ -1040,7 +1257,45 @@
   }, { threshold: 0.12 });
   reveals.forEach(r => observer.observe(r));
 
-  // ── ESTÁTICA SINCRONIZADA CON EL GLITCH DEL TÍTULO ──
+  // ── DISCORD MEMBER COUNTER ──
+  async function fetchDiscordStats() {
+    try {
+      const res  = await fetch('https://discord.com/api/v9/invites/UkWFk54NVW?with_counts=true');
+      const data = await res.json();
+      const total  = data.approximate_member_count;
+      const online = data.approximate_presence_count;
+      if (total)  document.getElementById('dc-total').textContent  = total.toLocaleString();
+      if (online) document.getElementById('dc-online').textContent = online.toLocaleString();
+      // actualiza el punto de total a rojo cuando carga
+      document.querySelector('.discord-stat__dot--gray').style.background = 'var(--red-glow)';
+      document.querySelector('.discord-stat__dot--gray').style.boxShadow   = '0 0 6px var(--red-glow)';
+    } catch (e) {
+      document.getElementById('dc-total').textContent  = '—';
+      document.getElementById('dc-online').textContent = '—';
+    }
+  }
+  fetchDiscordStats();
+  setInterval(fetchDiscordStats, 60000); // refresca cada 60s
+
+  // ── HUD DATA STREAMS ──
+  const streamData = [
+    'FAMAE','PMC','BRM5','OPERATIVO','CIFRADO','COORD',
+    '27°S','70°W','SAHEL','ESCOLTA','CONVOY','INTEL',
+    'SEC-04','AUTH','SYS','ONLINE','ACTIVO','RTB',
+    'CALLSIGN','BRAVO','ROMEO','MIKE','FOXTROT','KILO',
+    'AES256','ENCRYPT','CANAL','SEGURO','ACK','XMIT',
+    'LAT','LNG','ALT','MGRS','WP','LZ','HLZ','EVA',
+  ];
+  function buildStream(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const repeated = Array.from({length: 120}, () =>
+      streamData[Math.floor(Math.random() * streamData.length)]
+    ).join(' ∙ ');
+    el.textContent = repeated + ' ∙ ' + repeated; // doble para loop suave
+  }
+  buildStream('stream-left');
+  buildStream('stream-right');
   // animation: glitch 8s 2s infinite → el glitch ocurre ~93% del ciclo de 8s
   const GLITCH_FIRST = 2000 + 8000 * 0.93;
   setTimeout(function glitchLoop() {
