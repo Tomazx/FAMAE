@@ -32,6 +32,64 @@
     min-height: 100vh;
   }
 
+  /* ── BOOT SCREEN ── */
+  #boot-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 32px 40px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    overflow: hidden;
+    cursor: default;
+    user-select: none;
+  }
+  #boot-screen.hidden { display: none; }
+  .boot-line {
+    color: #e8e8e8;
+    white-space: pre;
+    opacity: 0;
+    transition: color 0.1s;
+  }
+  .boot-line.show { opacity: 1; }
+  .boot-line.ok   .boot-tag { color: #4ade80; }
+  .boot-line.fail .boot-tag { color: #e74c3c; }
+  .boot-cursor {
+    display: inline-block;
+    width: 8px; height: 1em;
+    background: #e8e8e8;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blinkCursor 0.6s step-end infinite;
+  }
+  @keyframes blinkCursor { 0%,100%{opacity:1} 50%{opacity:0} }
+  /* glitch corruption */
+  .boot-glitch {
+    animation: bootGlitchLine 0.08s steps(1) infinite;
+  }
+  @keyframes bootGlitchLine {
+    0%   { transform: translateX(0); }
+    25%  { transform: translateX(-3px) skewX(-1deg); }
+    50%  { transform: translateX(4px); }
+    75%  { transform: translateX(-2px) skewX(1deg); }
+    100% { transform: translateX(0); }
+  }
+  #boot-screen.corrupting .boot-line { color: #e74c3c; }
+  #boot-screen.corrupting { animation: screenCorrupt 0.12s steps(1) infinite; }
+  @keyframes screenCorrupt {
+    0%   { filter: none; }
+    20%  { filter: brightness(2) contrast(1.4); clip-path: inset(10% 0 5% 0); }
+    40%  { filter: none; clip-path: none; }
+    60%  { filter: saturate(0) brightness(3); clip-path: inset(30% 0 20% 0); }
+    80%  { filter: none; clip-path: none; }
+    100% { filter: brightness(1.5); }
+  }
+
   /* ── HUD OVERLAYS ── */
   .hud-scanline {
     position: fixed; inset: 0; z-index: 1; pointer-events: none;
@@ -201,45 +259,91 @@
     .sound-toggle { bottom: 16px; right: 16px; padding: 10px 14px; font-size: 0.62rem; }
   }
 
-  /* ── DISCORD COUNTER ── */
-  .discord-counter {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+  /* ── VENTANA HUD FLOTANTE ── */
+  .hud-window {
+    position: fixed;
+    bottom: 80px;
+    left: 24px;
+    z-index: 150;
+    width: 230px;
+    background: rgba(6,6,6,0.88);
+    border: 1px solid rgba(192,57,43,0.4);
+    backdrop-filter: blur(12px);
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    animation: hudWindowIn 0.6s ease forwards;
+    box-shadow: 0 0 24px rgba(192,57,43,0.12), inset 0 0 40px rgba(0,0,0,0.4);
   }
-  .discord-stat {
+  @keyframes hudWindowIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .hud-window__titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 10px;
+    background: rgba(192,57,43,0.12);
+    border-bottom: 1px solid rgba(192,57,43,0.25);
+  }
+  .hud-window__title {
+    color: var(--red-glow);
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .hud-window__dots {
+    display: flex; gap: 4px;
+  }
+  .hud-window__dot {
+    width: 5px; height: 5px; border-radius: 50%;
+  }
+  .hud-window__dot:nth-child(1) { background: rgba(192,57,43,0.9); }
+  .hud-window__dot:nth-child(2) { background: rgba(192,57,43,0.5); }
+  .hud-window__dot:nth-child(3) { background: rgba(192,57,43,0.2); }
+  .hud-window__body {
+    padding: 10px 12px;
     display: flex;
     flex-direction: column;
+    gap: 7px;
+  }
+  .hud-window__row {
+    display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 12px 24px;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    min-width: 110px;
-  }
-  .discord-stat__value {
-    font-family: var(--mono);
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--red-glow);
-    line-height: 1;
-  }
-  .discord-stat__label {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+    justify-content: space-between;
+    gap: 8px;
     color: var(--muted);
+    border-bottom: 1px solid rgba(192,57,43,0.06);
+    padding-bottom: 6px;
   }
-  .discord-stat__dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    margin-bottom: 2px;
+  .hud-window__row:last-child { border-bottom: none; padding-bottom: 0; }
+  .hud-window__label {
+    display: flex; align-items: center; gap: 6px;
   }
-  .discord-stat__dot--green { background: #3ba55d; box-shadow: 0 0 6px #3ba55d; }
-  .discord-stat__dot--gray  { background: #888; }
+  .hud-window__val {
+    color: var(--text);
+    font-size: 0.7rem;
+  }
+  .hud-window__val--red   { color: var(--red-glow); }
+  .hud-window__val--green { color: #3ba55d; }
+  .hud-dot {
+    width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0;
+  }
+  .hud-dot--red   { background: var(--red-glow); box-shadow: 0 0 5px var(--red-glow); animation: dotBlink 4s ease-in-out infinite; }
+  .hud-dot--green { background: #3ba55d; box-shadow: 0 0 5px #3ba55d; animation: dotBlink 2.5s ease-in-out infinite; }
+  @keyframes dotBlink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .hud-window__footer {
+    padding: 4px 12px;
+    border-top: 1px solid rgba(192,57,43,0.1);
+    font-size: 0.52rem;
+    color: rgba(192,57,43,0.3);
+    letter-spacing: 0.15em;
+    text-align: center;
+  }
+  @media (max-width: 600px) {
+    .hud-window { left: 12px; bottom: 70px; width: 190px; }
+  }
   .hero {
     position: relative;
     z-index: 1;
@@ -724,6 +828,11 @@
 </head>
 <body>
 
+<!-- BOOT SCREEN -->
+<div id="boot-screen">
+  <div id="boot-lines"></div>
+</div>
+
 <!-- HUD OVERLAYS -->
 <div class="hud-scanline"></div>
 <div class="hud-noise"></div>
@@ -768,19 +877,7 @@
   <h1 class="hero-title">FAMAE</h1>
   <div class="hero-divider"></div>
   <p class="hero-sub">SIN HONOR, NO HAY CONTRATO</p>
-  <div class="discord-counter">
-    <div class="discord-stat">
-      <div class="discord-stat__dot discord-stat__dot--gray"></div>
-      <div class="discord-stat__value" id="dc-total">—</div>
-      <div class="discord-stat__label">Miembros</div>
-    </div>
-    <div class="discord-stat">
-      <div class="discord-stat__dot discord-stat__dot--green"></div>
-      <div class="discord-stat__value" id="dc-online">—</div>
-      <div class="discord-stat__label">En línea</div>
-    </div>
-  </div>
-  <div style="display:flex; gap:16px; margin-top:0px; flex-wrap:wrap; justify-content:center;">
+  <div style="display:flex; gap:16px; margin-top:32px; flex-wrap:wrap; justify-content:center;">
     <a href="https://discord.gg/UkWFk54NVW" target="_blank" class="discord-cta">
       <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.245.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.076.076 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
       Unirse al Discord
@@ -1025,6 +1122,63 @@
   <span>SIN HONOR, NO HAY CONTRATO</span>
 </footer>
 
+<!-- VENTANA HUD FLOTANTE -->
+<div class="hud-window">
+  <div class="hud-window__titlebar">
+    <span class="hud-window__title">// SYS STATUS</span>
+    <div class="hud-window__dots">
+      <div class="hud-window__dot"></div>
+      <div class="hud-window__dot"></div>
+      <div class="hud-window__dot"></div>
+    </div>
+  </div>
+  <div class="hud-window__body">
+    <div class="hud-window__row">
+      <div class="hud-window__label">
+        <div class="hud-dot hud-dot--red"></div>
+        <span>SISTEMA</span>
+      </div>
+      <span class="hud-window__val hud-window__val--red">ONLINE</span>
+    </div>
+    <div class="hud-window__row">
+      <div class="hud-window__label">
+        <div class="hud-dot hud-dot--red"></div>
+        <span>UPTIME</span>
+      </div>
+      <span class="hud-window__val" id="hud-uptime">00:00:00</span>
+    </div>
+    <div class="hud-window__row">
+      <div class="hud-window__label">
+        <div class="hud-dot hud-dot--red"></div>
+        <span>HORA LOCAL</span>
+      </div>
+      <span class="hud-window__val" id="hud-clock">00:00:00</span>
+    </div>
+    <div class="hud-window__row">
+      <div class="hud-window__label">
+        <div class="hud-dot hud-dot--red"></div>
+        <span>MIEMBROS</span>
+      </div>
+      <span class="hud-window__val hud-window__val--red" id="dc-total">—</span>
+    </div>
+    <div class="hud-window__row">
+      <div class="hud-window__label">
+        <div class="hud-dot hud-dot--green"></div>
+        <span>EN LÍNEA</span>
+      </div>
+      <span class="hud-window__val hud-window__val--green" id="dc-online">—</span>
+    </div>
+    <div class="hud-window__row">
+      <div class="hud-window__label">
+        <div class="hud-dot hud-dot--red"></div>
+        <span>CIFRADO</span>
+      </div>
+      <span class="hud-window__val hud-window__val--red">AES-256</span>
+    </div>
+  </div>
+  <div class="hud-window__footer">FAMAE PMC · LAT 27.3°S · 70.1°W</div>
+</div>
+
 <script>
   // ════════════════════════════════════════════════════════
   //  CONFIGURACIÓN DE AUDIO — editá solo esta sección
@@ -1257,6 +1411,126 @@
   }, { threshold: 0.12 });
   reveals.forEach(r => observer.observe(r));
 
+  // ── BOOT SCREEN ──
+  (function() {
+    const screen = document.getElementById('boot-screen');
+    const container = document.getElementById('boot-lines');
+
+    const lines = [
+      { text: 'FAMAE TACTICAL OS v2.4.1 — BIOS POST OK',           tag: null,  delay: 0   },
+      { text: 'CPU: FAMAE-X4 @ 3.8GHz ... [4 cores detected]',     tag: null,  delay: 180 },
+      { text: 'RAM: 32768MB DDR5 ... ',                             tag: 'OK',  delay: 320 },
+      { text: 'STORAGE: /dev/sda1 FAMAE_ROOT ... ',                 tag: 'OK',  delay: 440 },
+      { text: 'Initializing cryptographic modules ... ',            tag: 'OK',  delay: 580 },
+      { text: 'Loading kernel: famae-tactical-5.15.0 ...',          tag: null,  delay: 700 },
+      { text: '[    0.000] Booting Linux kernel 5.15.0-famae',      tag: null,  delay: 820 },
+      { text: '[    0.183] ACPI: IRQ0 used by override',            tag: null,  delay: 900 },
+      { text: '[    0.421] PCI: Bus 0000:00 root complex',          tag: null,  delay: 980 },
+      { text: '[    0.834] NET: Registered PF_INET protocol family',tag: null,  delay: 1060 },
+      { text: 'Starting AES-256 encryption layer ... ',             tag: 'OK',  delay: 1180 },
+      { text: 'Mounting encrypted volumes ... ',                    tag: 'OK',  delay: 1300 },
+      { text: 'Starting tactical comms daemon ... ',                tag: 'OK',  delay: 1420 },
+      { text: 'Loading FAMAE PMC mission database ... ',            tag: 'OK',  delay: 1540 },
+      { text: 'Authenticating operator credentials ...',            tag: null,  delay: 1660 },
+      { text: '>>> ACCESS GRANTED — CLEARANCE LEVEL: ALPHA',        tag: null,  delay: 1900 },
+      { text: 'Starting FAMAE interface ... ',                      tag: 'OK',  delay: 2050 },
+      { text: '',                                                    tag: null,  delay: 2200 },
+      { text: 'Welcome, operator. Stay frosty.',                    tag: null,  delay: 2300 },
+    ];
+
+    let timers = [];
+
+    function spawnLine(data) {
+      const div = document.createElement('div');
+      div.className = 'boot-line' + (data.tag === 'OK' ? ' ok' : data.tag === 'FAIL' ? ' fail' : '');
+      if (data.tag) {
+        div.innerHTML = data.text + '<span class="boot-tag">[ ' + data.tag + ' ]</span>';
+      } else {
+        div.textContent = data.text;
+      }
+      container.appendChild(div);
+      requestAnimationFrame(() => div.classList.add('show'));
+    }
+
+    // Muestra las líneas una a una
+    lines.forEach(line => {
+      timers.push(setTimeout(() => spawnLine(line), line.delay));
+    });
+
+    // Añade cursor parpadeando al final
+    timers.push(setTimeout(() => {
+      const cur = document.createElement('div');
+      cur.className = 'boot-line show';
+      cur.innerHTML = '_ <span class="boot-cursor"></span>';
+      container.appendChild(cur);
+    }, 2450));
+
+    // Fase de corrupción — texto se vuelve rojo y glitchea
+    timers.push(setTimeout(() => {
+      screen.classList.add('corrupting');
+      // Hace glitch a líneas random
+      const all = container.querySelectorAll('.boot-line');
+      all.forEach(el => {
+        if (Math.random() > 0.4) el.classList.add('boot-glitch');
+      });
+    }, 3000));
+
+    // Corrupción de caracteres random
+    timers.push(setTimeout(() => {
+      const chars = '█▓▒░╔╗╚╝║═╠╣╦╩╬▄▀■□▪▫';
+      const all = container.querySelectorAll('.boot-line');
+      let itr = 0;
+      const corrupt = setInterval(() => {
+        if (itr > 18) { clearInterval(corrupt); return; }
+        all.forEach(el => {
+          if (Math.random() > 0.6) {
+            const orig = el.textContent;
+            const arr  = orig.split('');
+            for (let i = 0; i < 4; i++) {
+              const pos = Math.floor(Math.random() * arr.length);
+              arr[pos] = chars[Math.floor(Math.random() * chars.length)];
+            }
+            el.textContent = arr.join('');
+          }
+        });
+        itr++;
+      }, 60);
+    }, 3200));
+
+    // Flash final y desaparece
+    timers.push(setTimeout(() => {
+      screen.style.transition = 'opacity 0.35s ease';
+      screen.style.opacity = '0';
+      setTimeout(() => screen.classList.add('hidden'), 370);
+    }, 3900));
+
+    // Click para saltear
+    screen.addEventListener('click', () => {
+      timers.forEach(clearTimeout);
+      screen.style.transition = 'opacity 0.2s';
+      screen.style.opacity = '0';
+      setTimeout(() => screen.classList.add('hidden'), 220);
+    });
+  })();
+
+  // ── BARRA DE ESTADO: RELOJ Y UPTIME ──
+  const startTime = Date.now();
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function updateClock() {
+    const now = new Date();
+    const hh = pad(now.getHours()), mm = pad(now.getMinutes()), ss = pad(now.getSeconds());
+    const clock = document.getElementById('hud-clock');
+    if (clock) clock.textContent = `${hh}:${mm}:${ss}`;
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const uh = pad(Math.floor(elapsed / 3600));
+    const um = pad(Math.floor((elapsed % 3600) / 60));
+    const us = pad(elapsed % 60);
+    const uptime = document.getElementById('hud-uptime');
+    if (uptime) uptime.textContent = `${uh}:${um}:${us}`;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
   // ── DISCORD MEMBER COUNTER ──
   async function fetchDiscordStats() {
     try {
@@ -1266,16 +1540,10 @@
       const online = data.approximate_presence_count;
       if (total)  document.getElementById('dc-total').textContent  = total.toLocaleString();
       if (online) document.getElementById('dc-online').textContent = online.toLocaleString();
-      // actualiza el punto de total a rojo cuando carga
-      document.querySelector('.discord-stat__dot--gray').style.background = 'var(--red-glow)';
-      document.querySelector('.discord-stat__dot--gray').style.boxShadow   = '0 0 6px var(--red-glow)';
-    } catch (e) {
-      document.getElementById('dc-total').textContent  = '—';
-      document.getElementById('dc-online').textContent = '—';
-    }
+    } catch (e) { /* sin conexión, queda en — */ }
   }
   fetchDiscordStats();
-  setInterval(fetchDiscordStats, 60000); // refresca cada 60s
+  setInterval(fetchDiscordStats, 60000);
 
   // ── HUD DATA STREAMS ──
   const streamData = [
@@ -1303,5 +1571,6 @@
     setInterval(() => playSFX('glitch'), 8000);
   }, GLITCH_FIRST);
 </script>
+
 </body>
 </html>
