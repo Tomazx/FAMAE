@@ -39,7 +39,7 @@
 
   // ════════════════════════════════════════════════════════
 
-  let soundOn = false;
+  let soundOn = false; // empieza false hasta que el boot desbloquee el audio
   const sfxCache = {};
 
   // precarga de efectos
@@ -56,7 +56,7 @@
   musicTrack.preload = 'auto';
 
   function playSFX(key, vol = 1) {
-    if (!soundOn && key !== 'poweron' && key !== 'poweroff') return;
+    if (!soundOn) return;
     const base = sfxCache[key];
     if (!base) return;
     const node = base.cloneNode(true);
@@ -64,34 +64,52 @@
     node.play().catch(() => {});
   }
 
+  // activa el audio después del boot (primera interacción del usuario)
+  function activateSound() {
+    if (soundOn) return;
+    soundOn = true;
+    soundBtn.classList.add('active');
+    wavesPath.style.display = '';
+    xLine1.style.display    = 'none';
+    xLine2.style.display    = 'none';
+    soundLabel.textContent  = 'AUDIO ACTIVO';
+    musicTrack.play().catch(() => {});
+  }
+
   // ── TOGGLE DE SONIDO ──
-  const soundBtn  = document.getElementById('sound-toggle');
-  const wavesPath = document.getElementById('sound-waves');
-  const xLine1    = document.getElementById('sound-x1');
-  const xLine2    = document.getElementById('sound-x2');
+  const soundBtn   = document.getElementById('sound-toggle');
+  const wavesPath  = document.getElementById('sound-waves');
+  const xLine1     = document.getElementById('sound-x1');
+  const xLine2     = document.getElementById('sound-x2');
   const soundLabel = document.getElementById('sound-label');
+
+  // estado inicial del botón — activo visualmente
+  soundBtn.classList.add('active');
+  wavesPath.style.display = '';
+  xLine1.style.display    = 'none';
+  xLine2.style.display    = 'none';
+  soundLabel.textContent  = 'AUDIO ACTIVO';
 
   soundBtn.addEventListener('click', () => {
     soundOn = !soundOn;
     soundBtn.classList.toggle('active', soundOn);
-    wavesPath.style.display  = soundOn ? '' : 'none';
-    xLine1.style.display     = soundOn ? 'none' : '';
-    xLine2.style.display     = soundOn ? 'none' : '';
-    soundLabel.textContent   = soundOn ? 'AUDIO ACTIVO' : 'ACTIVAR AUDIO';
+    wavesPath.style.display = soundOn ? '' : 'none';
+    xLine1.style.display    = soundOn ? 'none' : '';
+    xLine2.style.display    = soundOn ? 'none' : '';
+    soundLabel.textContent  = soundOn ? 'AUDIO ACTIVO' : 'AUDIO SILENCIADO';
 
     if (soundOn) {
       playSFX('poweron');
-      musicTrack.play().catch(() => {});  // arranca la música
+      musicTrack.play().catch(() => {});
     } else {
       playSFX('poweroff');
-      // fade out de la música en 1.5 segundos en vez de cortar seco
       const fadeOut = setInterval(() => {
         if (musicTrack.volume > 0.015) {
           musicTrack.volume = Math.max(0, musicTrack.volume - 0.015);
         } else {
           musicTrack.pause();
           musicTrack.currentTime = 0;
-          musicTrack.volume = MUSIC_VOLUME; // restaura para el próximo play
+          musicTrack.volume = MUSIC_VOLUME;
           clearInterval(fadeOut);
         }
       }, 30);
@@ -446,6 +464,8 @@
           screen.classList.add('hidden');
           if (splash) splash.classList.remove('show');
           if (bootCtx) bootCtx.close();
+          // activar audio principal ahora que hay interacción confirmada
+          activateSound();
         }, 520);
       }, 2200);
     }, 3500));
@@ -458,6 +478,7 @@
       setTimeout(() => {
         screen.classList.add('hidden');
         if (bootCtx) bootCtx.close();
+        activateSound();
       }, 220);
     });
   })();
