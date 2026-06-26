@@ -292,8 +292,7 @@
       if (audioUnlocked) return;
       try {
         bootCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (bootCtx.state === 'suspended') bootCtx.resume();
-        audioUnlocked = true;
+        bootCtx.resume().then(() => { audioUnlocked = true; });
       } catch(e) {}
     }
 
@@ -384,9 +383,7 @@
     document.addEventListener('mousemove', unlockBootAudio, { once: true });
     document.addEventListener('keydown',   unlockBootAudio, { once: true });
     document.addEventListener('touchstart',unlockBootAudio, { once: true, passive: true });
-    // intento inmediato (funciona en algunos navegadores sin interacción)
-    setTimeout(unlockBootAudio, 100);
-
+    document.addEventListener('click',     unlockBootAudio, { once: true });
     lines.forEach(line => {
       timers.push(setTimeout(() => spawnLine(line), line.delay));
     });
