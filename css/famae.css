@@ -1237,3 +1237,81 @@
     .stat { border-right: none; border-bottom: 1px solid var(--glass-border); }
     footer { flex-direction: column; gap: 12px; text-align: center; }
   }
+/* ══════════════════════════════════════
+   CSS § TERMINAL POPUP (bienvenida)
+══════════════════════════════════════ */
+#term-popup {
+  position: fixed;
+  bottom: -520px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(680px, 90vw);
+  z-index: 8000;
+  background: #0a0a0a;
+  border: 1px solid rgba(192,57,43,0.45);
+  box-shadow: 0 0 40px rgba(192,57,43,0.2), 0 -4px 60px rgba(0,0,0,0.8);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  transition: bottom 0.6s cubic-bezier(0.22,1,0.36,1);
+  overflow: hidden;
+}
+#term-popup.visible { bottom: 50%; transform: translateX(-50%) translateY(50%); }
+#term-popup.minimizing {
+  transition: all 0.5s cubic-bezier(0.4,0,0.2,1);
+  bottom: 8px;
+  left: 24px;
+  transform: none;
+  width: 320px;
+}
+#term-popup.minimized {
+  bottom: 8px;
+  left: 24px;
+  transform: none;
+  width: 320px;
+}
+.term-popup__bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 12px;
+  background: rgba(192,57,43,0.1);
+  border-bottom: 1px solid rgba(192,57,43,0.2);
+  cursor: default;
+}
+.term-popup__title {
+  font-size: 0.6rem; letter-spacing: 0.18em;
+  color: rgba(192,57,43,0.8); text-transform: uppercase;
+}
+.term-popup__dots { display: flex; gap: 5px; }
+.term-popup__dot  { width: 9px; height: 9px; border-radius: 50%; }
+.term-popup__dot--r { background: #ff5f57; cursor: pointer; }
+.term-popup__dot--y { background: #ffbd2e; cursor: pointer; }
+.term-popup__dot--g { background: #28ca41; cursor: pointer; }
+#term-popup-body {
+  padding: 14px 18px;
+  max-height: 320px;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+}
+#term-popup.minimized #term-popup-body {
+  max-height: 0; padding: 0;
+}
+.term-popup__mini {
+  display: none;
+  padding: 5px 12px;
+  font-size: 0.58rem;
+  color: rgba(192,57,43,0.6);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#term-popup.minimized .term-popup__mini { display: block; }
+.tp-line { color: rgba(255,255,255,0.75); white-space: pre-wrap; }
+.tp-green { color: #4ade80; }
+.tp-red   { color: #e74c3c; }
+.tp-dim   { color: rgba(255,255,255,0.3); }
+.tp-cursor {
+  display: inline-block; width: 7px; height: 0.85em;
+  background: #4ade80; vertical-align: text-bottom;
+  animation: blinkCursor 1s step-end infinite;
+}
