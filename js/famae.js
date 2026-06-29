@@ -463,6 +463,7 @@
           if (bootCtx) bootCtx.close();
           // activar audio principal ahora que hay interacción confirmada
           activateSound();
+          setTimeout(launchTermPopup, 400);
         }, 520);
       }, 2200);
     }, 3500));
@@ -476,6 +477,7 @@
         screen.classList.add('hidden');
         if (bootCtx) bootCtx.close();
         activateSound();
+        setTimeout(launchTermPopup, 300);
       }, 220);
     });
   })();
@@ -723,3 +725,121 @@
     playSFX('glitch');
     setInterval(() => playSFX('glitch'), 8000);
   }, GLITCH_FIRST);
+// ── TERMINAL POPUP DE BIENVENIDA ──
+function launchTermPopup() {
+  const popup  = document.getElementById('term-popup');
+  const body   = document.getElementById('term-popup-body');
+  const mini   = document.getElementById('tp-mini-text');
+  if (!popup || !body) return;
+
+  const lines = [
+    { t: 'dim',   text: '════════════════════════════════════════' },
+    { t: 'green', text: '[FAMAE SECURE TERMINAL v2.4.1]' },
+    { t: 'dim',   text: '════════════════════════════════════════' },
+    { t: '',      text: '' },
+    { t: 'green', text: '[SYSTEM]  Conexión establecida — cifrado AES-256 activo' },
+    { t: 'green', text: '[AUTH]    Operador verificado — Nivel ALPHA concedido' },
+    { t: '',      text: '' },
+    { t: '',      text: '[INFO]    Bienvenido a la página oficial de FAMAE Company.' },
+    { t: '',      text: '[INFO]    Fuerza Armada Mercenaria de Acción Especial — BRM5.' },
+    { t: '',      text: '[INFO]    Operando en teatros tácticos desde 2025.' },
+    { t: '',      text: '' },
+    { t: 'red',   text: '[WARN]    Acceso restringido. Si no eres operador autorizado,' },
+    { t: 'red',   text: '[WARN]    cierra esta terminal y retira tus tropas.' },
+    { t: '',      text: '' },
+    { t: 'green', text: '[STATUS]  Servidor: ONLINE  |  Discord: ACTIVO  |  Ops: EN ESPERA' },
+    { t: '',      text: '' },
+    { t: 'dim',   text: '════════════════════════════════════════' },
+    { t: 'green', text: '[OK]      Iniciando interfaz de operaciones...' },
+    { t: 'dim',   text: '════════════════════════════════════════' },
+  ];
+
+  const miniMsgs = [
+    '// monitoreando canales tácticos...',
+    '// sincronizando con Discord...',
+    '// cifrado AES-256 activo',
+    '// escaneando frecuencias...',
+    '// sistema operativo — sin amenazas',
+    '// FAMAE PMC — en espera de órdenes',
+    '// uptime: estable',
+    '// comprobando integridad del servidor...',
+    '// LAT 27.3°S · LNG 70.1°W',
+    '// BRM5 teatro: ESTABLE',
+  ];
+
+  // subir desde abajo
+  popup.classList.add('visible');
+
+  let lineIdx = 0;
+  const cursor = document.createElement('span');
+  cursor.className = 'tp-cursor';
+
+  function typeLine() {
+    if (lineIdx >= lines.length) {
+      // terminó de escribir — minimizar después de 1.8s
+      setTimeout(minimize, 1800);
+      return;
+    }
+    const { t, text } = lines[lineIdx++];
+    const div = document.createElement('div');
+    div.className = 'tp-line' + (t === 'green' ? ' tp-green' : t === 'red' ? ' tp-red' : t === 'dim' ? ' tp-dim' : '');
+
+    if (!text) {
+      div.innerHTML = '&nbsp;';
+      body.appendChild(div);
+      setTimeout(typeLine, 60);
+      return;
+    }
+
+    body.appendChild(div);
+    body.appendChild(cursor);
+
+    let i = 0;
+    const speed = text.length > 40 ? 12 : 20;
+    const iv = setInterval(() => {
+      div.textContent += text[i++];
+      if (i >= text.length) {
+        clearInterval(iv);
+        div.appendChild; // keep
+        if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
+        setTimeout(typeLine, 80 + Math.random() * 60);
+      }
+    }, speed);
+  }
+
+  setTimeout(typeLine, 300);
+
+  function minimize() {
+    popup.classList.remove('visible');
+    popup.classList.add('minimizing');
+    setTimeout(() => {
+      popup.classList.remove('minimizing');
+      popup.classList.add('minimized');
+      rotateMiniText();
+    }, 500);
+  }
+
+  let miniIdx = 0;
+  function rotateMiniText() {
+    mini.textContent = miniMsgs[miniIdx % miniMsgs.length];
+    miniIdx++;
+    setTimeout(rotateMiniText, 3200 + Math.random() * 1200);
+  }
+
+  // botón minimizar (punto amarillo)
+  document.getElementById('tp-min')?.addEventListener('click', () => {
+    if (!popup.classList.contains('minimized')) minimize();
+    else {
+      popup.classList.remove('minimized');
+      popup.classList.add('visible');
+    }
+  });
+
+  // botón cerrar (punto rojo)
+  document.getElementById('tp-close')?.addEventListener('click', () => {
+    popup.style.transition = 'opacity 0.2s, bottom 0.3s';
+    popup.style.opacity = '0';
+    popup.style.bottom = '-300px';
+    setTimeout(() => popup.style.display = 'none', 320);
+  });
+}
