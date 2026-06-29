@@ -428,44 +428,39 @@
     }, 3200));
 
     timers.push(setTimeout(() => {
-      // detener la corrupción
+      // detener la corrupción — pantalla queda en negro
       screen.classList.remove('corrupting');
       screen.style.animation = 'none';
-      // limpiar y mostrar splash
       container.innerHTML = '';
       screen.style.opacity = '1';
       screen.style.transition = 'none';
-      const splash = document.getElementById('boot-splash');
-      if (splash) {
-        splash.classList.add('show');
-        // animar porcentaje
-        const pct = document.getElementById('splash-pct');
-        if (pct) {
-          let v = 0;
-          const iv = setInterval(() => {
-            v = Math.min(100, v + Math.floor(Math.random() * 8 + 2));
-            pct.textContent = v + '%';
-            if (v >= 100) clearInterval(iv);
-          }, 60);
-        }
-      }
-      // fade out del boot + splash juntos
-      setTimeout(() => {
-        screen.style.transition = 'opacity 0.5s ease';
-        screen.style.opacity = '0';
+      screen.style.background = '#000';
+      if (bootCtx) bootCtx.close();
+      activateSound();
+      // lanzar terminal inmediatamente en la pantalla negra
+      launchTermPopup(function onTermDone() {
+        // cuando el terminal termina/se cierra → mostrar splash FAMAE
+        const splash = document.getElementById('boot-splash');
+        screen.classList.add('hidden');
         if (splash) {
-          splash.style.transition = 'opacity 0.5s ease';
-          splash.style.opacity = '0';
+          splash.classList.add('show');
+          const pct = document.getElementById('splash-pct');
+          if (pct) {
+            let v = 0;
+            const iv = setInterval(() => {
+              v = Math.min(100, v + Math.floor(Math.random() * 8 + 2));
+              pct.textContent = v + '%';
+              if (v >= 100) clearInterval(iv);
+            }, 60);
+          }
+          // splash se muestra 2.5s y desaparece
+          setTimeout(() => {
+            splash.style.transition = 'opacity 0.6s ease';
+            splash.style.opacity = '0';
+            setTimeout(() => splash.classList.remove('show'), 620);
+          }, 2500);
         }
-        setTimeout(() => {
-          screen.classList.add('hidden');
-          if (splash) splash.classList.remove('show');
-          if (bootCtx) bootCtx.close();
-          // activar audio principal ahora que hay interacción confirmada
-          activateSound();
-          setTimeout(launchTermPopup, 400);
-        }, 520);
-      }, 2200);
+      });
     }, 3500));
 
     screen.addEventListener('click', () => {
@@ -477,7 +472,7 @@
         screen.classList.add('hidden');
         if (bootCtx) bootCtx.close();
         activateSound();
-        setTimeout(launchTermPopup, 300);
+        launchTermPopup(null);
       }, 220);
     });
   })();
@@ -726,11 +721,11 @@
     setInterval(() => playSFX('glitch'), 8000);
   }, GLITCH_FIRST);
 // ── TERMINAL POPUP DE BIENVENIDA ──
-function launchTermPopup() {
+function launchTermPopup(onDone) {
   const popup  = document.getElementById('term-popup');
   const body   = document.getElementById('term-popup-body');
   const mini   = document.getElementById('tp-mini-text');
-  if (!popup || !body) return;
+  if (!popup || !body) { if (onDone) onDone(); return; }
 
   const lines = [
     { t: 'dim',   text: '════════════════════════════════════════' },
@@ -755,19 +750,18 @@ function launchTermPopup() {
   ];
 
   const miniMsgs = [
-    '// monitoreando canales tácticos...',
-    '// sincronizando con Discord...',
-    '// cifrado AES-256 activo',
-    '// escaneando frecuencias...',
-    '// sistema operativo — sin amenazas',
-    '// FAMAE PMC — en espera de órdenes',
-    '// uptime: estable',
-    '// comprobando integridad del servidor...',
-    '// LAT 27.3°S · LNG 70.1°W',
-    '// BRM5 teatro: ESTABLE',
+    '● FAMAE PMC — sistema activo',
+    '● monitoreando canales tácticos...',
+    '● cifrado AES-256 activo',
+    '● sincronizando con Discord...',
+    '● escaneando frecuencias...',
+    '● sin amenazas detectadas',
+    '● en espera de órdenes',
+    '● LAT 27.3°S · LNG 70.1°W',
+    '● BRM5 teatro: ESTABLE',
+    '● comprobando integridad...',
   ];
 
-  // subir desde abajo
   popup.classList.add('visible');
 
   let lineIdx = 0;
@@ -776,33 +770,28 @@ function launchTermPopup() {
 
   function typeLine() {
     if (lineIdx >= lines.length) {
-      // terminó de escribir — minimizar después de 1.8s
       setTimeout(minimize, 1800);
       return;
     }
     const { t, text } = lines[lineIdx++];
     const div = document.createElement('div');
     div.className = 'tp-line' + (t === 'green' ? ' tp-green' : t === 'red' ? ' tp-red' : t === 'dim' ? ' tp-dim' : '');
-
     if (!text) {
       div.innerHTML = '&nbsp;';
       body.appendChild(div);
       setTimeout(typeLine, 60);
       return;
     }
-
     body.appendChild(div);
     body.appendChild(cursor);
-
     let i = 0;
-    const speed = text.length > 40 ? 12 : 20;
+    const speed = text.length > 40 ? 11 : 18;
     const iv = setInterval(() => {
       div.textContent += text[i++];
       if (i >= text.length) {
         clearInterval(iv);
-        div.appendChild; // keep
         if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
-        setTimeout(typeLine, 80 + Math.random() * 60);
+        setTimeout(typeLine, 70 + Math.random() * 50);
       }
     }, speed);
   }
@@ -816,30 +805,76 @@ function launchTermPopup() {
       popup.classList.remove('minimizing');
       popup.classList.add('minimized');
       rotateMiniText();
+      makeDraggable();
+      if (onDone) onDone();
     }, 500);
   }
 
   let miniIdx = 0;
   function rotateMiniText() {
+    if (!popup.classList.contains('minimized')) return;
     mini.textContent = miniMsgs[miniIdx % miniMsgs.length];
     miniIdx++;
-    setTimeout(rotateMiniText, 3200 + Math.random() * 1200);
+    setTimeout(rotateMiniText, 3000 + Math.random() * 1200);
+  }
+
+  // ── arrastrar el widget minimizado ──
+  function makeDraggable() {
+    let drag = false, ox = 0, oy = 0;
+    popup.addEventListener('mousedown', e => {
+      if (!popup.classList.contains('minimized')) return;
+      drag = true;
+      ox = e.clientX - popup.getBoundingClientRect().left;
+      oy = e.clientY - popup.getBoundingClientRect().top;
+      popup.style.transition = 'none';
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', e => {
+      if (!drag) return;
+      const x = Math.max(0, Math.min(window.innerWidth  - popup.offsetWidth,  e.clientX - ox));
+      const y = Math.max(0, Math.min(window.innerHeight - popup.offsetHeight, e.clientY - oy));
+      popup.style.left = x + 'px'; popup.style.bottom = 'auto';
+      popup.style.top  = y + 'px';
+    });
+    document.addEventListener('mouseup', () => { drag = false; });
+    // touch
+    popup.addEventListener('touchstart', e => {
+      if (!popup.classList.contains('minimized')) return;
+      const t = e.touches[0];
+      drag = true;
+      ox = t.clientX - popup.getBoundingClientRect().left;
+      oy = t.clientY - popup.getBoundingClientRect().top;
+    }, { passive: true });
+    document.addEventListener('touchmove', e => {
+      if (!drag) return;
+      const t = e.touches[0];
+      const x = Math.max(0, Math.min(window.innerWidth  - popup.offsetWidth,  t.clientX - ox));
+      const y = Math.max(0, Math.min(window.innerHeight - popup.offsetHeight, t.clientY - oy));
+      popup.style.left = x + 'px'; popup.style.bottom = 'auto';
+      popup.style.top  = y + 'px';
+    }, { passive: true });
+    document.addEventListener('touchend', () => { drag = false; });
   }
 
   // botón minimizar (punto amarillo)
-  document.getElementById('tp-min')?.addEventListener('click', () => {
+  document.getElementById('tp-min')?.addEventListener('click', e => {
+    e.stopPropagation();
     if (!popup.classList.contains('minimized')) minimize();
     else {
       popup.classList.remove('minimized');
+      popup.style.cssText = '';
       popup.classList.add('visible');
     }
   });
 
-  // botón cerrar (punto rojo)
-  document.getElementById('tp-close')?.addEventListener('click', () => {
-    popup.style.transition = 'opacity 0.2s, bottom 0.3s';
+  // botón cerrar (punto rojo) → dispara onDone → muestra splash
+  document.getElementById('tp-close')?.addEventListener('click', e => {
+    e.stopPropagation();
+    popup.style.transition = 'opacity 0.2s, transform 0.3s';
     popup.style.opacity = '0';
-    popup.style.bottom = '-300px';
-    setTimeout(() => popup.style.display = 'none', 320);
+    popup.style.transform = popup.classList.contains('minimized')
+      ? 'translateY(20px)' : 'translateX(-50%) translateY(20px)';
+    setTimeout(() => { popup.style.display = 'none'; }, 320);
+    if (onDone) { onDone(); }
   });
 }
