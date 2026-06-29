@@ -1297,13 +1297,14 @@
 }
 .term-popup__mini {
   display: none;
-  padding: 5px 12px;
-  font-size: 0.58rem;
-  color: rgba(192,57,43,0.6);
-  letter-spacing: 0.1em;
+  padding: 6px 12px;
+  font-size: 0.65rem;
+  color: rgba(74,222,128,0.85);
+  letter-spacing: 0.08em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 0 0 8px rgba(74,222,128,0.4);
 }
 #term-popup.minimized .term-popup__mini { display: block; }
 .tp-line { color: rgba(255,255,255,0.75); white-space: pre-wrap; }
