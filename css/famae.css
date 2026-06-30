@@ -1243,32 +1243,37 @@
 #term-popup {
   position: fixed;
   bottom: -520px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(680px, 90vw);
+  right: 24px;
+  left: auto;
+  transform: none;
+  width: min(480px, 88vw);
   z-index: 10001;
   background: #0a0a0a;
   border: 1px solid rgba(192,57,43,0.45);
   box-shadow: 0 0 40px rgba(192,57,43,0.2), 0 -4px 60px rgba(0,0,0,0.8);
   font-family: 'Share Tech Mono', monospace;
-  font-size: 0.78rem;
-  line-height: 1.7;
+  font-size: 0.74rem;
+  line-height: 1.65;
   transition: bottom 0.6s cubic-bezier(0.22,1,0.36,1);
   overflow: hidden;
 }
-#term-popup.visible { bottom: 50%; transform: translateX(-50%) translateY(50%); }
+#term-popup.visible { bottom: 90px; }
 #term-popup.minimizing {
   transition: all 0.5s cubic-bezier(0.4,0,0.2,1);
   bottom: 8px;
+  right: auto;
   left: 24px;
-  transform: none;
   width: 320px;
 }
 #term-popup.minimized {
   bottom: 8px;
+  right: auto;
   left: 24px;
-  transform: none;
   width: 320px;
+}
+@media (max-width: 600px) {
+  #term-popup { right: 12px; width: 90vw; }
+  #term-popup.minimizing, #term-popup.minimized { left: 12px; width: 240px; }
 }
 .term-popup__bar {
   display: flex; align-items: center; justify-content: space-between;
