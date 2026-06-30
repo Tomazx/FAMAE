@@ -427,41 +427,40 @@
       }, 60);
     }, 3200));
 
+    function showSplash() {
+      const splash = document.getElementById('boot-splash');
+      if (!splash) return;
+      splash.classList.add('show');
+      const pct = document.getElementById('splash-pct');
+      if (pct) {
+        let v = 0;
+        const iv = setInterval(() => {
+          v = Math.min(100, v + Math.floor(Math.random() * 8 + 2));
+          pct.textContent = v + '%';
+          if (v >= 100) clearInterval(iv);
+        }, 60);
+      }
+      setTimeout(() => {
+        splash.style.transition = 'opacity 0.6s ease';
+        splash.style.opacity = '0';
+        setTimeout(() => splash.classList.remove('show'), 620);
+      }, 2500);
+    }
+
     timers.push(setTimeout(() => {
-      // detener la corrupción — pantalla queda en negro
+      // detener corrupción — esconder boot screen AHORA
       screen.classList.remove('corrupting');
       screen.style.animation = 'none';
-      container.innerHTML = '';
-      screen.style.opacity = '1';
-      screen.style.transition = 'none';
-      screen.style.background = '#000';
+      screen.style.transition = 'opacity 0.3s ease';
+      screen.style.opacity = '0';
       if (bootCtx) bootCtx.close();
       activateSound();
-      // lanzar terminal inmediatamente en la pantalla negra
-      launchTermPopup(function onTermDone() {
-        // cuando el terminal termina/se cierra → mostrar splash FAMAE
-        const splash = document.getElementById('boot-splash');
+      // esconder boot screen y lanzar terminal
+      setTimeout(() => {
         screen.classList.add('hidden');
-        if (splash) {
-          splash.classList.add('show');
-          const pct = document.getElementById('splash-pct');
-          if (pct) {
-            let v = 0;
-            const iv = setInterval(() => {
-              v = Math.min(100, v + Math.floor(Math.random() * 8 + 2));
-              pct.textContent = v + '%';
-              if (v >= 100) clearInterval(iv);
-            }, 60);
-          }
-          // splash se muestra 2.5s y desaparece
-          setTimeout(() => {
-            splash.style.transition = 'opacity 0.6s ease';
-            splash.style.opacity = '0';
-            setTimeout(() => splash.classList.remove('show'), 620);
-          }, 2500);
-        }
-      });
-    }, 3500));
+        launchTermPopup(showSplash);
+      }, 320);
+    }, 3200));
 
     screen.addEventListener('click', () => {
       unlockBootAudio();
@@ -472,7 +471,7 @@
         screen.classList.add('hidden');
         if (bootCtx) bootCtx.close();
         activateSound();
-        launchTermPopup(null);
+        launchTermPopup(showSplash);
       }, 220);
     });
   })();
