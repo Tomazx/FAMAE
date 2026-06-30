@@ -427,24 +427,26 @@
       }, 60);
     }, 3200));
 
-    function showSplash() {
+    function showSplash(durationMs) {
       const splash = document.getElementById('boot-splash');
       if (!splash) return;
       splash.classList.add('show');
       const pct = document.getElementById('splash-pct');
+      const total = Math.max(1400, durationMs || 2500); // mínimo 1.4s para que no sea instantáneo
       if (pct) {
         let v = 0;
+        const step = Math.max(40, Math.floor(total / 100) * 4); // ritmo ajustado a la duración
         const iv = setInterval(() => {
           v = Math.min(100, v + Math.floor(Math.random() * 8 + 2));
           pct.textContent = v + '%';
           if (v >= 100) clearInterval(iv);
-        }, 60);
+        }, step);
       }
       setTimeout(() => {
         splash.style.transition = 'opacity 0.6s ease';
         splash.style.opacity = '0';
         setTimeout(() => splash.classList.remove('show'), 620);
-      }, 2500);
+      }, total);
     }
 
     timers.push(setTimeout(() => {
@@ -458,7 +460,8 @@
       // esconder boot screen y lanzar terminal
       setTimeout(() => {
         screen.classList.add('hidden');
-        launchTermPopup(showSplash);
+        const t0 = Date.now();
+        launchTermPopup(() => showSplash(Date.now() - t0));
       }, 320);
     }, 3200));
 
@@ -471,7 +474,8 @@
         screen.classList.add('hidden');
         if (bootCtx) bootCtx.close();
         activateSound();
-        launchTermPopup(showSplash);
+        const t0 = Date.now();
+        launchTermPopup(() => showSplash(Date.now() - t0));
       }, 220);
     });
   })();
@@ -869,11 +873,9 @@ function launchTermPopup(onDone) {
   // botón cerrar (punto rojo) → dispara onDone → muestra splash
   document.getElementById('tp-close')?.addEventListener('click', e => {
     e.stopPropagation();
-    popup.style.transition = 'opacity 0.2s, transform 0.3s';
+    popup.style.transition = 'opacity 0.25s';
     popup.style.opacity = '0';
-    popup.style.transform = popup.classList.contains('minimized')
-      ? 'translateY(20px)' : 'translateX(-50%) translateY(20px)';
-    setTimeout(() => { popup.style.display = 'none'; }, 320);
+    setTimeout(() => { popup.style.display = 'none'; }, 260);
     if (onDone) { onDone(); }
   });
 }
