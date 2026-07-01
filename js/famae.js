@@ -427,42 +427,40 @@
       }, 60);
     }, 3200));
 
-    function showSplash(durationMs) {
+    function showSplash() {
       const splash = document.getElementById('boot-splash');
       if (!splash) return;
       splash.classList.add('show');
+      // animar porcentaje
       const pct = document.getElementById('splash-pct');
-      const total = Math.max(1400, durationMs || 2500); // mínimo 1.4s para que no sea instantáneo
       if (pct) {
         let v = 0;
-        const step = Math.max(40, Math.floor(total / 100) * 4); // ritmo ajustado a la duración
         const iv = setInterval(() => {
-          v = Math.min(100, v + Math.floor(Math.random() * 8 + 2));
+          v = Math.min(100, v + Math.floor(Math.random() * 6 + 2));
           pct.textContent = v + '%';
           if (v >= 100) clearInterval(iv);
-        }, step);
+        }, 55);
       }
+      // splash dura 3s y desaparece solo
       setTimeout(() => {
-        splash.style.transition = 'opacity 0.6s ease';
+        splash.style.transition = 'opacity 0.8s ease';
         splash.style.opacity = '0';
-        setTimeout(() => splash.classList.remove('show'), 620);
-      }, total);
+        setTimeout(() => splash.classList.remove('show'), 820);
+      }, 3000);
     }
 
     timers.push(setTimeout(() => {
-      // detener corrupción — esconder boot screen AHORA
+      // detener corrupción
       screen.classList.remove('corrupting');
       screen.style.animation = 'none';
-      screen.style.transition = 'opacity 0.3s ease';
+      screen.style.transition = 'opacity 0.4s ease';
       screen.style.opacity = '0';
       if (bootCtx) bootCtx.close();
       activateSound();
-      // esconder boot screen y lanzar terminal
       setTimeout(() => {
         screen.classList.add('hidden');
-        const t0 = Date.now();
-        launchTermPopup(() => showSplash(Date.now() - t0));
-      }, 320);
+        showSplash();
+      }, 420);
     }, 3200));
 
     screen.addEventListener('click', () => {
@@ -474,8 +472,7 @@
         screen.classList.add('hidden');
         if (bootCtx) bootCtx.close();
         activateSound();
-        const t0 = Date.now();
-        launchTermPopup(() => showSplash(Date.now() - t0));
+        showSplash();
       }, 220);
     });
   })();
@@ -723,159 +720,3 @@
     playSFX('glitch');
     setInterval(() => playSFX('glitch'), 8000);
   }, GLITCH_FIRST);
-// ── TERMINAL POPUP DE BIENVENIDA ──
-function launchTermPopup(onDone) {
-  const popup  = document.getElementById('term-popup');
-  const body   = document.getElementById('term-popup-body');
-  const mini   = document.getElementById('tp-mini-text');
-  if (!popup || !body) { if (onDone) onDone(); return; }
-
-  const lines = [
-    { t: 'dim',   text: '════════════════════════════════════════' },
-    { t: 'green', text: '[FAMAE SECURE TERMINAL v2.4.1]' },
-    { t: 'dim',   text: '════════════════════════════════════════' },
-    { t: '',      text: '' },
-    { t: 'green', text: '[SYSTEM]  Conexión establecida — cifrado AES-256 activo' },
-    { t: 'green', text: '[AUTH]    Operador verificado — Nivel ALPHA concedido' },
-    { t: '',      text: '' },
-    { t: '',      text: '[INFO]    Bienvenido a la página oficial de FAMAE Company.' },
-    { t: '',      text: '[INFO]    Fuerza Armada Mercenaria de Acción Especial — BRM5.' },
-    { t: '',      text: '[INFO]    Operando en teatros tácticos desde 2025.' },
-    { t: '',      text: '' },
-    { t: 'red',   text: '[WARN]    Acceso restringido. Si no eres operador autorizado,' },
-    { t: 'red',   text: '[WARN]    cierra esta terminal y retira tus tropas.' },
-    { t: '',      text: '' },
-    { t: 'green', text: '[STATUS]  Servidor: ONLINE  |  Discord: ACTIVO  |  Ops: EN ESPERA' },
-    { t: '',      text: '' },
-    { t: 'dim',   text: '════════════════════════════════════════' },
-    { t: 'green', text: '[OK]      Iniciando interfaz de operaciones...' },
-    { t: 'dim',   text: '════════════════════════════════════════' },
-  ];
-
-  const miniMsgs = [
-    '● FAMAE PMC — sistema activo',
-    '● monitoreando canales tácticos...',
-    '● cifrado AES-256 activo',
-    '● sincronizando con Discord...',
-    '● escaneando frecuencias...',
-    '● sin amenazas detectadas',
-    '● en espera de órdenes',
-    '● LAT 27.3°S · LNG 70.1°W',
-    '● BRM5 teatro: ESTABLE',
-    '● comprobando integridad...',
-  ];
-
-  popup.classList.add('visible');
-
-  let lineIdx = 0;
-  const cursor = document.createElement('span');
-  cursor.className = 'tp-cursor';
-
-  function typeLine() {
-    if (lineIdx >= lines.length) {
-      setTimeout(minimize, 1800);
-      return;
-    }
-    const { t, text } = lines[lineIdx++];
-    const div = document.createElement('div');
-    div.className = 'tp-line' + (t === 'green' ? ' tp-green' : t === 'red' ? ' tp-red' : t === 'dim' ? ' tp-dim' : '');
-    if (!text) {
-      div.innerHTML = '&nbsp;';
-      body.appendChild(div);
-      setTimeout(typeLine, 60);
-      return;
-    }
-    body.appendChild(div);
-    body.appendChild(cursor);
-    let i = 0;
-    const speed = text.length > 40 ? 11 : 18;
-    const iv = setInterval(() => {
-      div.textContent += text[i++];
-      if (i >= text.length) {
-        clearInterval(iv);
-        if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
-        setTimeout(typeLine, 70 + Math.random() * 50);
-      }
-    }, speed);
-  }
-
-  setTimeout(typeLine, 300);
-
-  function minimize() {
-    popup.classList.remove('visible');
-    popup.classList.add('minimizing');
-    setTimeout(() => {
-      popup.classList.remove('minimizing');
-      popup.classList.add('minimized');
-      rotateMiniText();
-      makeDraggable();
-      if (onDone) onDone();
-    }, 500);
-  }
-
-  let miniIdx = 0;
-  function rotateMiniText() {
-    if (!popup.classList.contains('minimized')) return;
-    mini.textContent = miniMsgs[miniIdx % miniMsgs.length];
-    miniIdx++;
-    setTimeout(rotateMiniText, 3000 + Math.random() * 1200);
-  }
-
-  // ── arrastrar el widget minimizado ──
-  function makeDraggable() {
-    let drag = false, ox = 0, oy = 0;
-    popup.addEventListener('mousedown', e => {
-      if (!popup.classList.contains('minimized')) return;
-      drag = true;
-      ox = e.clientX - popup.getBoundingClientRect().left;
-      oy = e.clientY - popup.getBoundingClientRect().top;
-      popup.style.transition = 'none';
-      e.preventDefault();
-    });
-    document.addEventListener('mousemove', e => {
-      if (!drag) return;
-      const x = Math.max(0, Math.min(window.innerWidth  - popup.offsetWidth,  e.clientX - ox));
-      const y = Math.max(0, Math.min(window.innerHeight - popup.offsetHeight, e.clientY - oy));
-      popup.style.left = x + 'px'; popup.style.bottom = 'auto';
-      popup.style.top  = y + 'px';
-    });
-    document.addEventListener('mouseup', () => { drag = false; });
-    // touch
-    popup.addEventListener('touchstart', e => {
-      if (!popup.classList.contains('minimized')) return;
-      const t = e.touches[0];
-      drag = true;
-      ox = t.clientX - popup.getBoundingClientRect().left;
-      oy = t.clientY - popup.getBoundingClientRect().top;
-    }, { passive: true });
-    document.addEventListener('touchmove', e => {
-      if (!drag) return;
-      const t = e.touches[0];
-      const x = Math.max(0, Math.min(window.innerWidth  - popup.offsetWidth,  t.clientX - ox));
-      const y = Math.max(0, Math.min(window.innerHeight - popup.offsetHeight, t.clientY - oy));
-      popup.style.left = x + 'px'; popup.style.bottom = 'auto';
-      popup.style.top  = y + 'px';
-    }, { passive: true });
-    document.addEventListener('touchend', () => { drag = false; });
-  }
-
-  // botón minimizar (punto amarillo)
-  document.getElementById('tp-min')?.addEventListener('click', e => {
-    e.stopPropagation();
-    if (!popup.classList.contains('minimized')) minimize();
-    else {
-      popup.classList.remove('minimized');
-      popup.style.cssText = '';
-      popup.classList.add('visible');
-    }
-  });
-
-  // botón cerrar (punto rojo) → dispara onDone → muestra splash
-  document.getElementById('tp-close')?.addEventListener('click', e => {
-    e.stopPropagation();
-    popup.style.transition = 'opacity 0.25s';
-    popup.style.opacity = '0';
-    setTimeout(() => { popup.style.display = 'none'; }, 260);
-    if (onDone) { onDone(); }
-  });
-}
